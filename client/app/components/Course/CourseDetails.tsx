@@ -135,7 +135,7 @@ const CourseDetails = ({
               <br />
               {(data?.reviews && [...data.reviews].reverse()).map(
                 (item: any, index: number) => (
-                  <div className="w-full pb-4" key={index}>
+                  <div className="w-full pb-4\" key={index}>
                     <div className="flex">
                       <div className="w-[50px] h-[50px]">
                         <Image
