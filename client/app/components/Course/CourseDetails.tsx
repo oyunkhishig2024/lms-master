@@ -3,49 +3,39 @@ import CoursePlayer from "@/app/utils/CoursePlayer";
 import Ratings from "@/app/utils/Ratings";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { IoCheckmarkDoneOutline, IoCloseOutline } from "react-icons/io5";
+import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import { format } from "timeago.js";
 import CourseContentList from "../Course/CourseContentList";
-import { Elements } from "@stripe/react-stripe-js";
-import CheckOutForm from "../Payment/CheckOutForm";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import Image from "next/image";
 import { VscVerifiedFilled } from "react-icons/vsc";
 
 type Props = {
   data: any;
-  stripePromise: any;
-  clientSecret: string;
   setRoute: any;
   setOpen: any;
 };
 
 const CourseDetails = ({
   data,
-  stripePromise,
-  clientSecret,
   setRoute,
   setOpen: openAuthModal,
 }: Props) => {
-  const { data: userData,refetch } = useLoadUserQuery(undefined, {});
+  const { data: userData, refetch } = useLoadUserQuery(undefined, {});
   const [user, setUser] = useState<any>();
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setUser(userData?.user);
   }, [userData]);
 
-  const dicountPercentenge =
-    ((data?.estimatedPrice - data.price) / data?.estimatedPrice) * 100;
-
-  const discountPercentengePrice = dicountPercentenge.toFixed(0);
-
   const isPurchased =
     user && user?.courses?.find((item: any) => item._id === data._id);
 
-  const handleOrder = (e: any) => {
+  const handleEnrollment = (e: any) => {
     if (user) {
-      setOpen(true);
+      // Since all courses are free, we would implement direct enrollment logic here
+      // For now, let's redirect to the course access page
+      window.location.href = `/course-access/${data._id}`;
     } else {
       setRoute("Login");
       openAuthModal(true);
@@ -218,15 +208,8 @@ const CourseDetails = ({
               <CoursePlayer videoUrl={data?.demoUrl} title={data?.title} />
               <div className="flex items-center">
                 <h1 className="pt-5 text-[25px] text-black dark:text-white">
-                  {data.price === 0 ? "Free" : data.price + "$"}
+                  Free
                 </h1>
-                <h5 className="pl-3 text-[20px] mt-2 line-through opacity-80 text-black dark:text-white">
-                  {data.estimatedPrice}$
-                </h5>
-
-                <h4 className="pl-5 pt-4 text-[22px] text-black dark:text-white">
-                  {discountPercentengePrice}% Off
-                </h4>
               </div>
               <div className="flex items-center">
                 {isPurchased ? (
@@ -239,9 +222,9 @@ const CourseDetails = ({
                 ) : (
                   <div
                     className={`${styles.button} !w-[180px] my-3 font-Poppins cursor-pointer !bg-[crimson]`}
-                    onClick={handleOrder}
+                    onClick={handleEnrollment}
                   >
-                    Buy Now {data.price}$
+                    Enroll Now
                   </div>
                 )}
               </div>
@@ -262,28 +245,6 @@ const CourseDetails = ({
           </div>
         </div>
       </div>
-      <>
-        {open && (
-          <div className="w-full h-screen bg-[#00000036] fixed top-0 left-0 z-50 flex items-center justify-center">
-            <div className="w-[500px] min-h-[500px] bg-white rounded-xl shadow p-3">
-              <div className="w-full flex justify-end">
-                <IoCloseOutline
-                  size={40}
-                  className="text-black cursor-pointer"
-                  onClick={() => setOpen(false)}
-                />
-              </div>
-              <div className="w-full">
-                {stripePromise && clientSecret && (
-                  <Elements stripe={stripePromise} options={{ clientSecret }}>
-                    <CheckOutForm setOpen={setOpen} data={data} user={user} refetch={refetch} />
-                  </Elements>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </>
     </div>
   );
 };

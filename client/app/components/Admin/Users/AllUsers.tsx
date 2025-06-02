@@ -57,14 +57,15 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
         toast.error(errorMessage.data.message);
       }
     }
-  }, [updateError, isSuccess, deleteSuccess, deleteError]);
+  }, [updateError, isSuccess, deleteSuccess, deleteError, refetch]);
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.3 },
     { field: "name", headerName: "Name", flex: 0.5 },
     { field: "email", headerName: "Email", flex: 0.5 },
-    { field: "role", headerName: "Role", flex: 0.5 },
-    { field: "courses", headerName: "Purchased Courses", flex: 0.5 },
+    { field: "role", headerName: "Role", flex: 0.3 },
+    { field: "employerName", headerName: "Employer", flex: 0.5 },
+    { field: "courses", headerName: "Enrolled Courses", flex: 0.3 },
     { field: "created_at", headerName: "Joined At", flex: 0.5 },
     {
       field: " ",
@@ -117,6 +118,7 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
           name: item.name,
           email: item.email,
           role: item.role,
+          employerName: item.employerName || "N/A",
           courses: item.courses.length,
           created_at: format(item.createdAt),
         });
@@ -129,6 +131,7 @@ const AllCourses: FC<Props> = ({ isTeam }) => {
           name: item.name,
           email: item.email,
           role: item.role,
+          employerName: item.employerName || "N/A",
           courses: item.courses.length,
           created_at: format(item.createdAt),
         });

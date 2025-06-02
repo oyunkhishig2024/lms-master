@@ -13,6 +13,7 @@ export interface IUser extends Document {
     public_id: string;
     url: string;
   };
+  employerName: string;
   role: string;
   isVerified: boolean;
   courses: Array<{ courseId: string }>;
@@ -46,6 +47,10 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     avatar: {
       public_id: String,
       url: String,
+    },
+    employerName: {
+      type: String,
+      default: "",
     },
     role: {
       type: String,

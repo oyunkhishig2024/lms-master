@@ -17,6 +17,7 @@ type Props = {
 
 const ProfileInfo: FC<Props> = ({ avatar, user }) => {
   const [name, setName] = useState(user && user.name);
+  const [employerName, setEmployerName] = useState(user && user.employerName || "");
   const [updateAvatar, { isSuccess, error }] = useUpdateAvatarMutation();
   const [editProfile, { isSuccess: success, error: updateError }] =
     useEditProfileMutation();
@@ -46,13 +47,14 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
       toast.success("Profile updated successfully!");
       setLoadUser(true);
     }
-  }, [isSuccess, error,success, updateError]);
+  }, [isSuccess, error, success, updateError]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (name !== "") {
       await editProfile({
         name: name,
+        employerName: employerName,
       });
     }
   };
@@ -106,6 +108,16 @@ const ProfileInfo: FC<Props> = ({ avatar, user }) => {
                 className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
                 required
                 value={user?.email}
+              />
+            </div>
+            <div className="w-[100%] pt-2">
+              <label className="block pb-2">Employer Name (optional)</label>
+              <input
+                type="text"
+                className={`${styles.input} !w-[95%] mb-1 800px:mb-0`}
+                value={employerName}
+                onChange={(e) => setEmployerName(e.target.value)}
+                placeholder="Enter your employer's name"
               />
             </div>
             <input

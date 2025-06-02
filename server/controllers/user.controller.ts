@@ -26,12 +26,13 @@ interface IRegistrationBody {
   email: string;
   password: string;
   avatar?: string;
+  employerName?: string;
 }
 
 export const registrationUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password, employerName } = req.body;
 
       const isEmailExist = await userModel.findOne({ email });
       if (isEmailExist) {
@@ -42,6 +43,7 @@ export const registrationUser = CatchAsyncError(
         name,
         email,
         password,
+        employerName,
       };
 
       const activationToken = createActivationToken(user);
@@ -119,7 +121,7 @@ export const activateUser = CatchAsyncError(
         return next(new ErrorHandler("Invalid activation code", 400));
       }
 
-      const { name, email, password } = newUser.user;
+      const { name, email, password, employerName } = newUser.user;
 
       const existUser = await userModel.findOne({ email });
 
@@ -130,6 +132,7 @@ export const activateUser = CatchAsyncError(
         name,
         email,
         password,
+        employerName,
       });
 
       res.status(201).json({
@@ -148,11 +151,8 @@ interface ILoginRequest {
 }
 
 export const loginUser = CatchAsyncError(
-  
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('loginuser')
     try {
-      
       const { email, password } = req.body as ILoginRequest;
 
       if (!email || !password) {
@@ -169,10 +169,9 @@ export const loginUser = CatchAsyncError(
       if (!isPasswordMatch) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
-   console.log('dhhdh',user)
+
       sendToken(user, 200, res);
     } catch (error: any) {
-
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -290,18 +289,23 @@ export const socialAuth = CatchAsyncError(
 interface IUpdateUserInfo {
   name?: string;
   email?: string;
+  employerName?: string;
 }
 
 export const updateUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name } = req.body as IUpdateUserInfo;
+      const { name, employerName } = req.body as IUpdateUserInfo;
 
       const userId = req.user?._id;
       const user = await userModel.findById(userId);
 
       if (name && user) {
         user.name = name;
+      }
+      
+      if (employerName !== undefined && user) {
+        user.employerName = employerName;
       }
 
       await user?.save();

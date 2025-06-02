@@ -22,11 +22,12 @@ const schema = Yup.object().shape({
     .email("Invalid email!")
     .required("Please enter your email!"),
   password: Yup.string().required("Please enter your password!").min(6),
+  employerName: Yup.string(),
 });
 
 const Signup: FC<Props> = ({ setRoute }) => {
   const [show, setShow] = useState(false);
-  const [register,{data,error,isSuccess}] = useRegisterMutation(); 
+  const [register, { data, error, isSuccess }] = useRegisterMutation(); 
 
   useEffect(() => {
    if(isSuccess){
@@ -40,15 +41,15 @@ const Signup: FC<Props> = ({ setRoute }) => {
       toast.error(errorData.data.message);
     }
    }
-  }, [isSuccess,error]);
+  }, [isSuccess, error, data]);
   
 
   const formik = useFormik({
-    initialValues: { name: "", email: "", password: "" },
+    initialValues: { name: "", email: "", password: "", employerName: "" },
     validationSchema: schema,
-    onSubmit: async ({name, email, password }) => {
+    onSubmit: async ({ name, email, password, employerName }) => {
       const data = {
-        name,email,password
+        name, email, password, employerName
       };
       await register(data);
     },
@@ -61,16 +62,16 @@ const Signup: FC<Props> = ({ setRoute }) => {
       <h1 className={`${styles.title}`}>Join to ELearning</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
-          <label className={`${styles.label}`} htmlFor="email">
+          <label className={`${styles.label}`} htmlFor="name">
             Enter your Name
           </label>
           <input
             type="text"
-            name=""
+            name="name"
             value={values.name}
             onChange={handleChange}
             id="name"
-            placeholder="johndoe"
+            placeholder="John Doe"
             className={`${errors.name && touched.name && "border-red-500"} ${
               styles.input
             }`}
@@ -79,16 +80,37 @@ const Signup: FC<Props> = ({ setRoute }) => {
             <span className="text-red-500 pt-2 block">{errors.name}</span>
           )}
         </div>
+
+        <div className="mb-3">
+          <label className={`${styles.label}`} htmlFor="employerName">
+            Enter your Employer Name (optional)
+          </label>
+          <input
+            type="text"
+            name="employerName"
+            value={values.employerName}
+            onChange={handleChange}
+            id="employerName"
+            placeholder="Company Name"
+            className={`${errors.employerName && touched.employerName && "border-red-500"} ${
+              styles.input
+            }`}
+          />
+          {errors.employerName && touched.employerName && (
+            <span className="text-red-500 pt-2 block">{errors.employerName}</span>
+          )}
+        </div>
+
         <label className={`${styles.label}`} htmlFor="email">
           Enter your Email
         </label>
         <input
           type="email"
-          name=""
+          name="email"
           value={values.email}
           onChange={handleChange}
           id="email"
-          placeholder="loginmail@gmail.com"
+          placeholder="example@gmail.com"
           className={`${errors.email && touched.email && "border-red-500"} ${
             styles.input
           }`}
@@ -97,7 +119,7 @@ const Signup: FC<Props> = ({ setRoute }) => {
           <span className="text-red-500 pt-2 block">{errors.email}</span>
         )}
         <div className="w-full mt-5 relative mb-1">
-          <label className={`${styles.label}`} htmlFor="email">
+          <label className={`${styles.label}`} htmlFor="password">
             Enter your password
           </label>
           <input

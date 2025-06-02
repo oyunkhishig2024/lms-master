@@ -17,6 +17,10 @@ export const uploadCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
+      // Set price to 0 (free) regardless of what was submitted
+      data.price = 0;
+      data.estimatedPrice = 0;
+
       const thumbnail = data.thumbnail;
       if (thumbnail) {
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
@@ -40,6 +44,9 @@ export const editCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
+      // Ensure course is free
+      data.price = 0;
+      data.estimatedPrice = 0;
 
       const thumbnail = data.thumbnail;
 
@@ -143,7 +150,7 @@ export const getCourseByUser = CatchAsyncError(
       const courseId = req.params.id;
 
       const courseExists = userCourseList?.find(
-        (course: any) => course._id.toString() === courseId
+        (course) => course._id.toString() === courseId
       );
 
       if (!courseExists) {
@@ -166,26 +173,17 @@ export const getCourseByUser = CatchAsyncError(
   }
 );
 
-// add question in course
-interface IAddQuestionData {
-  question: string;
-  courseId: string;
-  contentId: string;
-}
-
 export const addQuestion = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { question, courseId, contentId }: IAddQuestionData = req.body;
+      const { question, courseId, contentId } = req.body;
       const course = await CourseModel.findById(courseId);
 
       if (!mongoose.Types.ObjectId.isValid(contentId)) {
         return next(new ErrorHandler("Invalid content id", 400));
       }
 
-      const couseContent = course?.courseData?.find((item: any) =>
-        item._id.equals(contentId)
-      );
+      const couseContent = course?.courseData?.find((item) => item._id.equals(contentId));
 
       if (!couseContent) {
         return next(new ErrorHandler("Invalid content id", 400));
@@ -220,19 +218,10 @@ export const addQuestion = CatchAsyncError(
   }
 );
 
-// add answer in course question
-interface IAddAnswerData {
-  answer: string;
-  courseId: string;
-  contentId: string;
-  questionId: string;
-}
-
 export const addAnwser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { answer, courseId, contentId, questionId }: IAddAnswerData =
-        req.body;
+      const { answer, courseId, contentId, questionId } = req.body;
 
       const course = await CourseModel.findById(courseId);
 
@@ -240,17 +229,13 @@ export const addAnwser = CatchAsyncError(
         return next(new ErrorHandler("Invalid content id", 400));
       }
 
-      const couseContent = course?.courseData?.find((item: any) =>
-        item._id.equals(contentId)
-      );
+      const couseContent = course?.courseData?.find((item) => item._id.equals(contentId));
 
       if (!couseContent) {
         return next(new ErrorHandler("Invalid content id", 400));
       }
 
-      const question = couseContent?.questions?.find((item: any) =>
-        item._id.equals(questionId)
-      );
+      const question = couseContent?.questions?.find((item) => item._id.equals(questionId));
 
       if (!question) {
         return next(new ErrorHandler("Invalid question id", 400));
@@ -309,18 +294,10 @@ export const addAnwser = CatchAsyncError(
   }
 );
 
-// add review in course
-interface IAddReviewData {
-  review: string;
-  rating: number;
-  userId: string;
-}
-
 export const addReview = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userCourseList = req.user?.courses;
-
       const courseId = req.params.id;
 
       // check if courseId already exists in userCourseList based on _id
@@ -336,9 +313,9 @@ export const addReview = CatchAsyncError(
 
       const course = await CourseModel.findById(courseId);
 
-      const { review, rating } = req.body as IAddReviewData;
+      const { review, rating } = req.body;
 
-      const reviewData: any = {
+      const reviewData = {
         user: req.user,
         rating,
         comment: review,
@@ -348,7 +325,7 @@ export const addReview = CatchAsyncError(
 
       let avg = 0;
 
-      course?.reviews.forEach((rev: any) => {
+      course?.reviews.forEach((rev) => {
         avg += rev.rating;
       });
 
@@ -378,16 +355,10 @@ export const addReview = CatchAsyncError(
   }
 );
 
-// add reply in review
-interface IAddReviewData {
-  comment: string;
-  courseId: string;
-  reviewId: string;
-}
 export const addReplyToReview = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { comment, courseId, reviewId } = req.body as IAddReviewData;
+      const { comment, courseId, reviewId } = req.body;
 
       const course = await CourseModel.findById(courseId);
 

@@ -34,8 +34,9 @@ const AllInvoices = ({ isDashboard }: Props) => {
           ...item,
           userName: user?.name,
           userEmail: user?.email,
+          employerName: user?.employerName || "N/A",
           title: course?.name,
-          price: "$" + course?.price,
+          price: "Free",
         };
       });
       setOrderData(temp);
@@ -48,8 +49,9 @@ const AllInvoices = ({ isDashboard }: Props) => {
     ...(isDashboard
       ? []
       : [
-          { field: "userEmail", headerName: "Email", flex: 1 },
-          { field: "title", headerName: "Course Title", flex: 1 },
+          { field: "userEmail", headerName: "Email", flex: 0.8 },
+          { field: "title", headerName: "Course Title", flex: 0.8 },
+          { field: "employerName", headerName: "Employer", flex: 0.7 },
         ]),
     { field: "price", headerName: "Price", flex: 0.5 },
     ...(isDashboard
@@ -83,6 +85,7 @@ const AllInvoices = ({ isDashboard }: Props) => {
         userEmail: item.userEmail,
         title: item.title,
         price: item.price,
+        employerName: item.employerName,
         created_at: format(item.createdAt),
       });
     });
